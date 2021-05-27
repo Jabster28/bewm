@@ -1,0 +1,16 @@
+[package]
+name = "bewm"
+version = "0.2.0"
+authors = ["Jabster28 <justynboyer@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cursive = "0.16.3"
+#
+[features]
+# no features by default
+default = []
+
+reverse_shell = []
