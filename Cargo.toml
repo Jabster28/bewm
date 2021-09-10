@@ -8,9 +8,13 @@ edition = "2018"
 
 [dependencies]
 cursive = "0.16.3"
+requestty = "0.1.1"
+tempfile = "3.2.0"
 #
 [features]
 # no features by default
 default = []
 
 reverse_shell = []
+reproduce = []
+busybox = []

