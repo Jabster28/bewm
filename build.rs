@@ -4,8 +4,7 @@ use std::process::{self, Command};
 fn main() {
     let mut x = Command::new("git")
         .arg("clone")
-        // .arg("https://github.com/Jabster28/bewmc/")
-        .arg("/Users/sticks/git/bewmc")
+        .arg("https://github.com/Jabster28/bewmc/")
         .spawn()
         .unwrap_or_else(|err| {
             eprintln!("Error: git failed.");
@@ -34,6 +33,8 @@ fn main() {
     let mut x = Command::new("wget")
         .arg("-N")
         .arg("https://frippery.org/files/busybox/busybox.exe")
+        .arg("-O")
+        .arg("busybox.exe")
         .spawn()
         .unwrap_or_else(|err| {
             eprintln!("Error: wget failed.");
