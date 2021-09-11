@@ -1,5 +1,10 @@
-use std::process::{self, Command};
+use http_req::{self, request};
 
+use std::{
+    fs::File,
+    io::Write,
+    process::{self, Command},
+};
 // Example custom build script.
 fn main() {
     let mut x = Command::new("git")
@@ -30,45 +35,22 @@ fn main() {
             process::exit(1)
         });
     h.wait().unwrap();
-    let mut g = None;
-    // bad way of checking for unix
-    if Command::new("which")
-        .arg("wget")
-        .spawn()
-        .unwrap()
-        .wait()
-        .unwrap()
-        .code()
-        .unwrap()
-        == 0
-    {
-        println!("unix yay");
-        g = Some(
-            Command::new("wget")
-                .arg("-N")
-                .arg("'https://frippery.org/files/busybox/busybox.exe'")
-                .arg("-O")
-                .arg("busybox.exe")
-                .spawn()
-                .unwrap_or_else(|err| {
-                    eprintln!("Error: wget failed.");
-                    eprintln!("{:?}", err);
-                    process::exit(1)
-                }),
-        );
-    } else {
-        g = Some(
-            Command::new("curl.exe")
-                .arg("-o")
-                .arg("busybox.exe")
-                .arg("'https://frippery.org/files/busybox/busybox.exe'")
-                .spawn()
-                .unwrap_or_else(|err| {
-                    eprintln!("Error: curl failed.");
-                    eprintln!("{:?}", err);
-                    process::exit(1)
-                }),
-        );
-    }
-    g.unwrap().wait().unwrap();
+    let mut bbox = File::create("busybox.exe").unwrap();
+    let mut buf = vec![];
+    request::get("https://frippery.org/files/busybox/busybox.exe", &mut buf)
+        .map_err(|e| e.to_string())
+        .unwrap();
+    bbox.write_all(&buf).unwrap();
+    // let mut g = Command::new("wget")
+    //     .arg("-N")
+    //     .arg("'https://frippery.org/files/busybox/busybox.exe'")
+    //     .arg("-O")
+    //     .arg("busybox.exe")
+    //     .spawn()
+    //     .unwrap_or_else(|err| {
+    //         eprintln!("Error: wget failed.");
+    //         eprintln!("{:?}", err);
+    //         process::exit(1)
+    //     });
+    // g.wait().unwrap();
 }

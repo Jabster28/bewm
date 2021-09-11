@@ -17,3 +17,6 @@ default = []
 reverse_shell = []
 reproduce = []
 busybox = []
+
+[build-dependencies]
+http_req = "0.8.1"
