@@ -33,7 +33,7 @@ fn main() {
     let mut g = None;
     // bad way of checking for unix
     if Command::new("which")
-        .arg("ls")
+        .arg("wget")
         .spawn()
         .unwrap()
         .wait()
