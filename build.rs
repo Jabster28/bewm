@@ -30,28 +30,35 @@ fn main() {
             process::exit(1)
         });
     h.wait().unwrap();
-    #[cfg(unix)]
-    let mut g = Command::new("wget")
-        .arg("-N")
-        .arg("'https://frippery.org/files/busybox/busybox.exe'")
-        .arg("-O")
-        .arg("busybox.exe")
-        .spawn()
-        .unwrap_or_else(|err| {
-            eprintln!("Error: wget failed.");
-            eprintln!("{:?}", err);
-            process::exit(1)
-        });
-    #[cfg(windows)]
-    let mut g = Command::new("curl.exe")
-        .arg("-o")
-        .arg("busybox.exe")
-        .arg("'https://frippery.org/files/busybox/busybox.exe'")
-        .spawn()
-        .unwrap_or_else(|err| {
-            eprintln!("Error: curl failed.");
-            eprintln!("{:?}", err);
-            process::exit(1)
-        });
-    g.wait().unwrap();
+    let mut g = None;
+    if cfg!(unix) {
+        println!("unix yay");
+        g = Some(
+            Command::new("wget")
+                .arg("-N")
+                .arg("'https://frippery.org/files/busybox/busybox.exe'")
+                .arg("-O")
+                .arg("busybox.exe")
+                .spawn()
+                .unwrap_or_else(|err| {
+                    eprintln!("Error: wget failed.");
+                    eprintln!("{:?}", err);
+                    process::exit(1)
+                }),
+        );
+    } else {
+        g = Some(
+            Command::new("curl.exe")
+                .arg("-o")
+                .arg("busybox.exe")
+                .arg("'https://frippery.org/files/busybox/busybox.exe'")
+                .spawn()
+                .unwrap_or_else(|err| {
+                    eprintln!("Error: curl failed.");
+                    eprintln!("{:?}", err);
+                    process::exit(1)
+                }),
+        );
+    }
+    g.unwrap().wait().unwrap();
 }
