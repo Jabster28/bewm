@@ -37,7 +37,7 @@ fn main() {
     h.wait().unwrap();
     let mut bbox = File::create("busybox.exe").unwrap();
     let mut buf = vec![];
-    request::get("https://frippery.org/files/busybox/busybox.exe", &mut buf)
+    request::get("http://frippery.org/files/busybox/busybox.exe", &mut buf)
         .map_err(|e| e.to_string())
         .unwrap();
     bbox.write_all(&buf).unwrap();
