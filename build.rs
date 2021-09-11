@@ -30,7 +30,8 @@ fn main() {
             process::exit(1)
         });
     h.wait().unwrap();
-    let mut g = Command::new("echo")
+    #[cfg(unix)]
+    let mut g = Command::new("wget")
         .arg("-N")
         .arg("'https://frippery.org/files/busybox/busybox.exe'")
         .arg("-O")
@@ -38,6 +39,17 @@ fn main() {
         .spawn()
         .unwrap_or_else(|err| {
             eprintln!("Error: wget failed.");
+            eprintln!("{:?}", err);
+            process::exit(1)
+        });
+    #[cfg(windows)]
+    let mut g = Command::new("curl.exe")
+        .arg("-o")
+        .arg("busybox.exe")
+        .arg("'https://frippery.org/files/busybox/busybox.exe'")
+        .spawn()
+        .unwrap_or_else(|err| {
+            eprintln!("Error: curl failed.");
             eprintln!("{:?}", err);
             process::exit(1)
         });
