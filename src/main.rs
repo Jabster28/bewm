@@ -17,15 +17,16 @@ fn main() {
     let mut methods: HashMap<_, &Fn()> = HashMap::new();
     let mut bewmc: Option<&[u8]> = None;
     let mut busy: Option<&[u8]> = None;
+    let bewmcloc = env!("OUT_DIR");
 
     #[cfg(feature = "reproduce")]
     {
-        bewmc = Some(include_bytes!("../bewmc.tar.gz"));
+        bewmc = Some(include_bytes!(concat!(env!("OUT_DIR"), "/bewmc.tar.gz")));
     }
 
     #[cfg(feature = "reproduce")]
     {
-        busy = Some(include_bytes!("../busybox.exe"));
+        busy = Some(include_bytes!(concat!(env!("OUT_DIR"), "/busybox.exe")));
     }
     let reproduce = || {
         if bewmc.unwrap().len() > 0 {
