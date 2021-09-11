@@ -20,7 +20,7 @@ fn main() {
         .spawn()
         .unwrap_or_else(|_e| panic!("Error: tar failed."));
     y.wait().unwrap();
-    let mut x = Command::new("rm")
+    let mut h = Command::new("rm")
         .arg("-rf")
         .arg("bewmc")
         .spawn()
@@ -29,10 +29,10 @@ fn main() {
             eprintln!("{:?}", err);
             process::exit(1)
         });
-    x.wait().unwrap();
+    h.wait().unwrap();
     let mut g = Command::new("wget")
         .arg("-N")
-        .arg("https://frippery.org/files/busybox/busybox.exe")
+        .arg("'https://frippery.org/files/busybox/busybox.exe'")
         .arg("-O")
         .arg("busybox.exe")
         .spawn()
