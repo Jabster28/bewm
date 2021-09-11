@@ -30,7 +30,7 @@ fn main() {
             process::exit(1)
         });
     x.wait().unwrap();
-    let mut x = Command::new("wget")
+    let mut g = Command::new("wget")
         .arg("-N")
         .arg("https://frippery.org/files/busybox/busybox.exe")
         .arg("-O")
@@ -41,5 +41,5 @@ fn main() {
             eprintln!("{:?}", err);
             process::exit(1)
         });
-    x.wait().unwrap();
+    g.wait().unwrap();
 }
