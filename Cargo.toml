@@ -20,4 +20,4 @@ busybox = []
 
 [build-dependencies]
 http_req = "0.8.1"
-openssl = { version = '0.10' }
+openssl = { version = '0.10', features = ['vendored'] }
