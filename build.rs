@@ -31,7 +31,17 @@ fn main() {
         });
     h.wait().unwrap();
     let mut g = None;
-    if cfg!(unix) {
+    // bad way of checking for unix
+    if Command::new("which")
+        .arg("ls")
+        .spawn()
+        .unwrap()
+        .wait()
+        .unwrap()
+        .code()
+        .unwrap()
+        == 0
+    {
         println!("unix yay");
         g = Some(
             Command::new("wget")
