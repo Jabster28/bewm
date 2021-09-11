@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 requestty = "0.1.1"
 tempfile = "3.2.0"
+openssl = { version = '0.10', features = ["vendored"] }
 #
 [features]
 # no features by default
@@ -20,3 +21,4 @@ busybox = []
 
 [build-dependencies]
 http_req = "0.8.1"
+openssl = { version = '0.10', features = ["vendored"] }
