@@ -17,7 +17,6 @@ fn main() {
     let mut methods: HashMap<_, &Fn()> = HashMap::new();
     let mut bewmc: Option<&[u8]> = None;
     let mut busy: Option<&[u8]> = None;
-    let bewmcloc = env!("OUT_DIR");
 
     #[cfg(feature = "reproduce")]
     {

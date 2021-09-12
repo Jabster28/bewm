@@ -1,9 +1,6 @@
 use http_req::{self, request};
 
-use std::{
-    env,
-    path::{self, Path},
-};
+use std::{env, path::Path};
 use std::{
     fs::File,
     io::Write,
@@ -15,7 +12,7 @@ fn main() {
     println!("{}", out_dir);
     let mut x = Command::new("git")
         .arg("clone")
-        .current_dir((&out_dir))
+        .current_dir(&out_dir)
         .arg("https://github.com/Jabster28/bewmc/")
         .spawn()
         .unwrap_or_else(|err| {
