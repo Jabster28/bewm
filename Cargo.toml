@@ -1,3 +1,5 @@
+cargo-features = ["strip"]
+
 [package]
 name = "bewm"
 version = "0.2.0"
@@ -21,3 +23,6 @@ busybox = []
 [build-dependencies]
 http_req = "0.8.1"
 openssl = { version = '0.10', features = ['vendored'] }
+
+[profile.release]
+strip = true
